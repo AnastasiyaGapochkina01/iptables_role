@@ -1,0 +1,31 @@
+---
+# tasks file for roles/iptables
+- name: Ensure iptables installed
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iptables
+    - iptables-persistent
+  when:
+    - ansible_os_family == 'Debian'
+
+- name: Ensure iptables service is enabled
+  service:
+    name: iptables
+    enabled: yes
+    state: started
+  changed_when: false
+
+- name: Configure ruleset
+  copy:
+    src: iptables.save
+    dest: /etc/iptables/rules.v4
+  notify:  restart iptables
+
+- name: Check firewall rules
+  shell: >
+      iptables -L -n -v
+  register: command
+
+- debug: var=command.stdout_lines
