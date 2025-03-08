@@ -1,0 +1,6 @@
+---
+# handlers file for roles/iptables
+- name: restart iptables
+  service:
+    name: iptables
+    state: restarted
